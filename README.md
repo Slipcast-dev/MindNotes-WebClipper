@@ -88,12 +88,10 @@ DRY_RUN=1 ./scripts/release.sh   # check and build the image without publishing 
 ./scripts/release.sh             # the webclipper-v<version> tag and a GitHub release
 ```
 
-A release contains the image, `plugin-manifest.json` and `SHA256SUMS.txt`. MindNotes before 1.7.0 doesn't know the
-`repository` field and looks for plugin releases in the app repository, so the script also puts a copy of the release
-there, marked “not latest” (otherwise MindNotes wouldn't find its own updates). Copies are made until 60 days after
-MindNotes 1.7.0 is released: it looks for the plugin here right away, and 1.5.x–1.6.x run on the same Macs and have
-time to update to it. After that the script makes no copy, and `./scripts/remove-app-copies.sh` removes the old ones
-(it shows the list and asks; before the deadline only with `FORCE=1`). Manually: `MIRROR_TO_APP_REPO=0` or `1`.
+A release contains the image, `plugin-manifest.json` and `SHA256SUMS.txt`. It is published only here: MindNotes 1.7.0
+and later looks for the plugin in this repository. MindNotes before 1.7.0 looked in the app repository; it updates to
+1.7.0 first and then gets the plugin. If a copy there is still needed: `MIRROR_TO_APP_REPO=1` (marked “not latest”,
+otherwise MindNotes wouldn't find its own updates); `./scripts/remove-app-copies.sh` removes copies.
 
 ## How it works
 

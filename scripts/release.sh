@@ -2,12 +2,11 @@
 # Выпуск Web Clipper: тег webclipper-v<версия>, образ установщика, plugin-manifest.json и суммы.
 #   ./scripts/release.sh                проверить, собрать, создать тег и выпуск на GitHub
 #   DRY_RUN=1 ./scripts/release.sh      всё, кроме тега и публикации
-#   MIRROR_TO_APP_REPO=0|1 ./scripts/release.sh  без копии / с копией в репозитории MindNotes, вопреки правилу ниже
+#   MIRROR_TO_APP_REPO=1 ./scripts/release.sh   ещё и копия в репозитории MindNotes (для MindNotes до 1.7.0)
 #
-# Выпуск публикуется в репозиторий из поля `repository` в manifest.json. MindNotes до 1.7.0 ищет выпуски плагина
-# только в репозитории приложения, поэтому туда кладётся копия — с пометкой «не последний»: по releases/latest MindNotes
-# ищет свои обновления. Копии делаются, пока не прошло 60 дней после выхода MindNotes 1.7.0 (scripts/app-copies.sh);
-# потом — нет, а старые убирает ./scripts/remove-app-copies.sh.
+# Выпуск публикуется только в репозиторий из поля `repository` в manifest.json: там его ищет MindNotes 1.7.0 и новее.
+# Копия в репозитории приложения — только по просьбе и с пометкой «не последний»: по releases/latest MindNotes ищет
+# свои обновления. Копии там убирает ./scripts/remove-app-copies.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -24,16 +23,7 @@ fail() { echo "Выпуск остановлен: $1"; exit 1; }
 [[ "$PLUGIN_REPO" =~ '^[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}$' && "${PLUGIN_REPO#*/}" != "." && "${PLUGIN_REPO#*/}" != ".." ]] \
     || fail "repository в manifest.json — нужно «владелец/имя» на GitHub"
 TARGETS=("$PLUGIN_REPO")
-if [[ -z "${MIRROR_TO_APP_REPO:-}" ]]; then
-    if copies_no_longer_needed; then
-        MIRROR_TO_APP_REPO=0
-        echo "Копия в репозитории MindNotes не нужна: MindNotes $COPIES_UNTIL_APP вышла больше $COPIES_GRACE_DAYS дней назад."
-        echo "Старые копии убирает ./scripts/remove-app-copies.sh"
-    else
-        MIRROR_TO_APP_REPO=1
-    fi
-fi
-[[ "$MIRROR_TO_APP_REPO" != 0 && "$PLUGIN_REPO" != "$APP_REPO" ]] && TARGETS+=("$APP_REPO")
+[[ "${MIRROR_TO_APP_REPO:-0}" == 1 && "$PLUGIN_REPO" != "$APP_REPO" ]] && TARGETS+=("$APP_REPO")
 
 # 1. Готовность: чистое дерево, новая версия, записи в обоих журналах.
 [[ -z "$(git status --porcelain)" || -n "${DRY_RUN:-}" ]] || fail "есть незакоммиченные изменения"
