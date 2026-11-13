@@ -40,6 +40,12 @@ What browsers don't let apps do (Apple and Google rules):
 
 The installer shows the state of each step and ticks off the finished ones. To connect a browser later: MindNotes Settings → Extensions → Connect Browsers.
 
+## Known limitations
+
+- Browsers don't let apps install extensions by themselves: Safari needs one checkbox (and, for the ad-hoc signed build, “Allow Unsigned Extensions”, which Safari resets on restart); Chrome and Chromium browsers need Developer mode and one drag until the extension is in the Chrome Web Store.
+- Images from other sites are downloaded by MindNotes: those served over plain http, behind a site login or larger than 8 MB stay links.
+- Article extraction is a simplified in-house algorithm and may pick up extra parts on complex layouts; Selection mode helps then.
+
 ## Updates
 
 MindNotes checks for plugin updates at launch and once a day. If a new version asks for no new permissions, it installs
