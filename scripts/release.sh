@@ -2,16 +2,16 @@
 # Выпуск Web Clipper: тег webclipper-v<версия>, образ установщика, plugin-manifest.json и суммы.
 #   ./scripts/release.sh                проверить, собрать, создать тег и выпуск на GitHub
 #   DRY_RUN=1 ./scripts/release.sh      всё, кроме тега и публикации
-#   MIRROR_TO_APP_REPO=0 ./scripts/release.sh   без копии выпуска в репозитории MindNotes (см. ниже)
+#   MIRROR_TO_APP_REPO=0|1 ./scripts/release.sh  без копии / с копией в репозитории MindNotes, вопреки правилу ниже
 #
-# Выпуск публикуется в репозиторий из поля `repository` в manifest.json. MindNotes до 1.7.0 не знает этого поля и ищет
-# выпуски плагина в репозитории приложения, поэтому по умолчанию туда же кладётся копия — с пометкой «не последний»:
-# по releases/latest MindNotes ищет свои обновления. Копии можно выключить, когда MindNotes до 1.7.0 не останется.
+# Выпуск публикуется в репозиторий из поля `repository` в manifest.json. MindNotes до 1.7.0 ищет выпуски плагина
+# только в репозитории приложения, поэтому туда кладётся копия — с пометкой «не последний»: по releases/latest MindNotes
+# ищет свои обновления. Копии делаются, пока не прошло 60 дней после выхода MindNotes 1.7.0 (scripts/app-copies.sh);
+# потом — нет, а старые убирает ./scripts/remove-app-copies.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-APP_REPO=$(/usr/bin/plutil -extract app.repository raw -o - contracts/plugin-api.json)
-APP_BRANCH=personal-ru
+source scripts/app-copies.sh
 PLUGIN_REPO=$(/usr/bin/plutil -extract repository raw -o - manifest.json 2>/dev/null) || PLUGIN_REPO=""
 version=$(/usr/bin/plutil -extract version raw -o - manifest.json)
 prefix=$(/usr/bin/plutil -extract updates raw -o - manifest.json)
@@ -24,7 +24,16 @@ fail() { echo "Выпуск остановлен: $1"; exit 1; }
 [[ "$PLUGIN_REPO" =~ '^[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9._-]{1,100}$' && "${PLUGIN_REPO#*/}" != "." && "${PLUGIN_REPO#*/}" != ".." ]] \
     || fail "repository в manifest.json — нужно «владелец/имя» на GitHub"
 TARGETS=("$PLUGIN_REPO")
-[[ "${MIRROR_TO_APP_REPO:-1}" != 0 && "$PLUGIN_REPO" != "$APP_REPO" ]] && TARGETS+=("$APP_REPO")
+if [[ -z "${MIRROR_TO_APP_REPO:-}" ]]; then
+    if copies_no_longer_needed; then
+        MIRROR_TO_APP_REPO=0
+        echo "Копия в репозитории MindNotes не нужна: MindNotes $COPIES_UNTIL_APP вышла больше $COPIES_GRACE_DAYS дней назад."
+        echo "Старые копии убирает ./scripts/remove-app-copies.sh"
+    else
+        MIRROR_TO_APP_REPO=1
+    fi
+fi
+[[ "$MIRROR_TO_APP_REPO" != 0 && "$PLUGIN_REPO" != "$APP_REPO" ]] && TARGETS+=("$APP_REPO")
 
 # 1. Готовность: чистое дерево, новая версия, записи в обоих журналах.
 [[ -z "$(git status --porcelain)" || -n "${DRY_RUN:-}" ]] || fail "есть незакоммиченные изменения"

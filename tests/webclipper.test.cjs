@@ -147,7 +147,14 @@ test('свой репозиторий; копия выпуска для MindNote
   assert.strictEqual(plugin.repository, contract.plugins[plugin.id].repository, 'MindNotes ищет выпуски здесь');
   const release = read('scripts/release.sh');
   assert.ok(/extract repository raw/.test(release), 'скрипт берёт репозиторий из описания плагина');
-  assert.ok(/MIRROR_TO_APP_REPO:-1/.test(release), 'копия в репозитории приложения — по умолчанию: старые MindNotes не знают поля repository');
+  const copies = read('scripts/app-copies.sh');
+  assert.ok(/source scripts\/app-copies\.sh/.test(release) && /copies_no_longer_needed/.test(release), 'копия делается по правилу, а не вручную');
+  assert.ok(/MIRROR_TO_APP_REPO=1/.test(release), 'пока MindNotes до 1.7.0 есть — копия по умолчанию');
+  assert.ok(/COPIES_UNTIL_APP=1\.7\.0/.test(copies) && /COPIES_GRACE_DAYS:-60/.test(copies), 'копии нужны до 60 дней после MindNotes 1.7.0');
+  const remove = read('scripts/remove-app-copies.sh');
+  assert.ok(/copies_no_longer_needed/.test(remove) && /FORCE/.test(remove), 'копии не удаляются раньше срока');
+  assert.ok(/startswith\(\\"\$prefix\\"\)/.test(remove), 'удаляются только выпуски плагина, не MindNotes');
+  assert.ok(/read -r "answer\?/.test(remove) && /--yes/.test(remove), 'перед удалением — вопрос');
   assert.ok(/--latest=false --target "\$APP_BRANCH"/.test(release), 'в репозитории приложения выпуск плагина не «последний»');
 });
 

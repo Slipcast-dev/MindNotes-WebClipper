@@ -8,6 +8,9 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+### Changed
+- Release copies in the MindNotes repository are made until 60 days after MindNotes 1.7.0 is released; after that `./scripts/remove-app-copies.sh` removes them.
+
 ## [1.0.2] - 2026-11-13
 
 Works with MindNotes 1.5.0 or later. The first release from this repository; it installs as a regular update, without questions, because the permissions have not changed.
