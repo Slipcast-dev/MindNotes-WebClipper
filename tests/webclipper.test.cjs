@@ -171,3 +171,15 @@ test('плагин поддерживает macOS 15 и новее незави�
   assert.ok(/typeof el\.checkVisibility === 'function'/.test(extract));
   assert.ok(/typeof OffscreenCanvas === 'undefined'/.test(read('browser/background.js')));
 });
+
+test('одна копия установщика — одно расширение в Safari', () => {
+  const model = read('Installer/InstallerModel.swift');
+  const app = read('Installer/InstallerApp.swift');
+  assert.ok(/static func removeOtherCopies\(\)/.test(model), 'новая версия в /Applications убирает старую из ~/Applications и наоборот');
+  assert.ok(/guard !isNewer\(version, than: mine\)/.test(model), 'более новую копию не трогает');
+  assert.ok(/other\.bundleIdentifier == id/.test(model), 'только копии этой же программы');
+  assert.ok(/applicationFolders\.contains\(url\.deletingLastPathComponent\(\)\.path\) \{ try\? fm\.trashItem/.test(model), 'в корзину — только из «Программ», остальное только снимается с регистрации');
+  assert.ok(/pluginkit/.test(model), 'расширение Safari снимается с регистрации');
+  assert.ok(/Relocation\.removeOtherCopies\(\)\s*\n\s*let ok = MainActor/.test(app), 'и при тихом обновлении');
+  assert.ok(/if auto \{ Relocation\.removeOtherCopies\(\) \}/.test(app), 'и при обычном запуске');
+});

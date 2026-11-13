@@ -10,6 +10,7 @@ struct WebClipperInstallerApp: App {
     init() {
         guard CommandLine.arguments.contains("--update") else { return }
         LSRegisterURL(Bundle.main.bundleURL as CFURL, true)
+        Relocation.removeOtherCopies()
         let ok = MainActor.assumeIsolated { InstallerModel.syncChromeFolder() }
         exit(ok ? 0 : 1)
     }
@@ -39,6 +40,7 @@ final class InstallerDelegate: NSObject, NSApplicationDelegate {
         let auto = !CommandLine.arguments.contains("--no-auto")
         if auto, Relocation.moveToApplicationsIfNeeded() { return }
         LSRegisterURL(Bundle.main.bundleURL as CFURL, true) // Safari находит расширение через регистрацию программы.
+        if auto { Relocation.removeOtherCopies() }
         NSApp.activate(ignoringOtherApps: true)
         model.start(auto: auto)
     }

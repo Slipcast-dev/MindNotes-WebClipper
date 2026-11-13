@@ -8,6 +8,9 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+### Fixed
+- Safari no longer shows the extension twice when a new version of the installer is put into Applications while an older one stays in ~/Applications (or the other way round): on launch, the installer moves its older copies to the Trash and unregisters copies elsewhere.
+
 ### Changed
 - Release copies in the MindNotes repository are made until 60 days after MindNotes 1.7.0 is released; after that `./scripts/remove-app-copies.sh` removes them.
 

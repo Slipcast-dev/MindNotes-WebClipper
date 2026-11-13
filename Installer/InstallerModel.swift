@@ -174,6 +174,59 @@ final class InstallerModel: ObservableObject {
 
 /// Установщик должен жить в «Программах»: Safari берёт расширение из программы, а браузеры — из постоянной папки.
 enum Relocation {
+    static let applicationFolders = [
+        FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Applications", isDirectory: true).standardizedFileURL.path,
+        "/Applications",
+    ]
+
+    /// Снять копию программы с регистрации: её расширение Safari и она сама больше не видны системе.
+    static func forget(_ app: URL) {
+        let appexes = (try? FileManager.default.contentsOfDirectory(at: app.appendingPathComponent("Contents/PlugIns"), includingPropertiesForKeys: nil)) ?? []
+        for appex in appexes where appex.pathExtension == "appex" { run("/usr/bin/pluginkit", ["-r", appex.path]) }
+        run("/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister", ["-u", app.path])
+    }
+
+    private static func run(_ tool: String, _ args: [String]) {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: tool)
+        p.arguments = args
+        p.standardOutput = FileHandle.nullDevice
+        p.standardError = FileHandle.nullDevice
+        try? p.run()
+        p.waitUntilExit()
+    }
+
+    /// Одна копия установщика — одно расширение в Safari. Новую версию можно поставить в /Applications, а старая
+    /// останется в ~/Applications (или наоборот), и Safari покажет расширение дважды. Поэтому копия из «Программ»
+    /// убирает остальные: копии не новее её в «Программах» — в корзину, копии в других местах (папка сборки,
+    /// смонтированный образ) — только снимает с регистрации. Более новую копию не трогает.
+    static func removeOtherCopies() {
+        let fm = FileManager.default
+        let here = Bundle.main.bundleURL.standardizedFileURL.resolvingSymlinksInPath()
+        guard applicationFolders.contains(here.deletingLastPathComponent().path), let id = Bundle.main.bundleIdentifier else { return }
+        let mine = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+        var candidates = NSWorkspace.shared.urlsForApplications(withBundleIdentifier: id)
+        candidates += applicationFolders.map { URL(fileURLWithPath: $0).appendingPathComponent(here.lastPathComponent) }
+        var seen = Set<String>()
+        for url in candidates.map({ $0.standardizedFileURL.resolvingSymlinksInPath() }) where url != here && seen.insert(url.path).inserted {
+            guard let other = Bundle(url: url), other.bundleIdentifier == id else { continue }
+            let version = other.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0"
+            guard !isNewer(version, than: mine) else { continue }
+            forget(url)
+            if applicationFolders.contains(url.deletingLastPathComponent().path) { try? fm.trashItem(at: url, resultingItemURL: nil) }
+        }
+    }
+
+    /// `1.0.10` новее `1.0.2`; недостающие части — нули.
+    static func isNewer(_ a: String, than b: String) -> Bool {
+        let x = a.split(separator: ".").map { Int($0) ?? 0 }, y = b.split(separator: ".").map { Int($0) ?? 0 }
+        for i in 0..<max(x.count, y.count) {
+            let p = i < x.count ? x[i] : 0, q = i < y.count ? y[i] : 0
+            if p != q { return p > q }
+        }
+        return false
+    }
+
     static func moveToApplicationsIfNeeded() -> Bool {
         let fm = FileManager.default
         let here = Bundle.main.bundleURL.standardizedFileURL
@@ -189,11 +242,7 @@ enum Relocation {
         } catch { return false }
         LSRegisterURL(target as CFURL, true)
         // Исходная копия (папка сборки, «Загрузки») не должна давать второе расширение в Safari.
-        let forget = Process()
-        forget.executableURL = URL(fileURLWithPath: "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister")
-        forget.arguments = ["-u", here.path]
-        try? forget.run()
-        forget.waitUntilExit()
+        forget(here)
         // Второй экземпляр запрещён (LSMultipleInstancesProhibited): копия запускается, когда эта уже вышла.
         let relaunch = Process()
         relaunch.executableURL = URL(fileURLWithPath: "/bin/sh")
