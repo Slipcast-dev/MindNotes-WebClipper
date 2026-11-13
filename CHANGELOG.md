@@ -3,7 +3,8 @@
 **English** · [Русский](CHANGELOG.ru.md)
 
 Plugin versions do not depend on the MindNotes version. Releases are `webclipper-v<version>` tags in this repository
-(`./scripts/release.sh`); up to and including 1.0.1 they were published in the MindNotes repository. The number goes up
+(`./scripts/release.sh`); 1.0.0 and 1.0.1 were published in the MindNotes repository, and those releases have since been
+removed there (MindNotes only installs the newest version). The number goes up
 with **every** release: that is how the installer and MindNotes know the plugin and extensions need updating.
 
 ## [Unreleased]
