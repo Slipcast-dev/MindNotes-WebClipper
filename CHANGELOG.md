@@ -8,6 +8,10 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-13
+
+Works with MindNotes 1.5.0 or later; installs as a regular update, without questions.
+
 ### Fixed
 - Safari no longer shows the extension twice when a new version of the installer is put into Applications while an older one stays in ~/Applications (or the other way round): on launch, the installer moves its older copies to the Trash and unregisters copies elsewhere.
 
