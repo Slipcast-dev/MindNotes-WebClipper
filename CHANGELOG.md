@@ -8,6 +8,10 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-13
+
+Works with MindNotes 1.5.0 or later. The first release from this repository; it installs as a regular update, without questions, because the permissions have not changed.
+
 ### Added
 - macOS 15 Sequoia and later: the installer and the Safari extension are built for macOS 15, regardless of the MindNotes minimum. The installer says so if the MindNotes on this Mac needs a newer macOS.
 
