@@ -17,5 +17,6 @@
   "components": {
     "chrome": "browser/chrome"
   },
-  "updates": "webclipper-v"
+  "updates": "webclipper-v",
+  "repository": "Slipcast-dev/MindNotes-WebClipper"
 }

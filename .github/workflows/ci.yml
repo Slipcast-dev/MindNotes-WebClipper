@@ -1,0 +1,33 @@
+# Web Clipper: тесты, сверка договора об API с MindNotes, сборка установщика с расширением Safari (macOS 15+, arm64).
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Tests and contract with MindNotes
+        run: CHECK_UPSTREAM=1 ./scripts/test.sh
+      - name: Build installer with Safari extension
+        run: ./scripts/build.sh
+      - name: Check build
+        run: |
+          app="build/MindNotes Web Clipper.app"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$app/Contents/Info.plist")" = 15.0
+          test -d "$app/Contents/Resources/WebClipper.mnplugin/browser/chrome"
+          ls "$app"/Contents/PlugIns/*.appex

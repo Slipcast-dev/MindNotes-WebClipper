@@ -1,0 +1,14 @@
+name: Idea · Предложение
+description: Suggest an improvement · Предложить улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you want to do? · Что хотите сделать?
+      description: The task, not the solution. · Задача, а не решение.
+    validations: { required: true }
+  - type: textarea
+    id: idea
+    attributes:
+      label: How could it work? · Как это могло бы работать?

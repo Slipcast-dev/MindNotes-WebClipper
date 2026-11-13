@@ -1,0 +1,33 @@
+name: Bug · Ошибка
+description: Something does not work · Что-то работает не так
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? · Что случилось?
+      description: What you did, what you expected, what happened. · Что делали, чего ожидали, что произошло.
+    validations: { required: true }
+  - type: input
+    id: os
+    attributes:
+      label: Mac and macOS version · Mac и версия macOS
+      placeholder: M1, macOS 15.6
+    validations: { required: true }
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version · Браузер и версия
+      placeholder: Safari 18.6, Chrome 142
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Web Clipper and MindNotes versions · Версии Web Clipper и MindNotes
+      placeholder: Web Clipper 1.0.1, MindNotes 1.6.2
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce · Как воспроизвести
+      description: Page address if it is public; do not attach personal data. · Адрес страницы, если она открытая; не прикладывайте личные данные.
