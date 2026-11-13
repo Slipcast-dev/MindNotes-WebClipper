@@ -22,12 +22,18 @@ async function ensurePaired() {
 }
 // Самообновление: установщик кладёт новые файлы на диск, а браузер держит в памяти старые. Расширение сравнивает
 // свою версию со сборкой на диске и перезапускается само — нажимать «Обновить» в браузере не нужно.
+const UPDATE_CHECK_MINUTES = 5;
+// Перезапуск прервал бы сохранение, поэтому во время вырезки он откладывается до её конца.
+let clipping = 0;
+let reloadPending = false;
 async function reloadIfUpdated() {
   try {
     const response = await fetch(chrome.runtime.getURL('manifest.json'), { cache: 'no-store' });
     const onDisk = await response.json();
     const running = chrome.runtime.getManifest();
-    if ((onDisk.version_name || onDisk.version) !== (running.version_name || running.version)) chrome.runtime.reload();
+    if ((onDisk.version_name || onDisk.version) === (running.version_name || running.version)) return;
+    if (clipping > 0) { reloadPending = true; return; }
+    chrome.runtime.reload();
   } catch (e) { /* файла нет — браузер сам сообщит об ошибке расширения */ }
 }
 
@@ -36,7 +42,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'mn-update') reloadIfUpdated();
 });
 chrome.runtime.onStartup.addListener(() => { ensurePaired(); reloadIfUpdated(); });
-chrome.alarms.create('mn-update', { periodInMinutes: 15 });
+// Фон браузер будит при каждом событии (окно, меню, клавиша, таймер) — тогда и сверяем версию: это чтение одного
+// файла с диска. Таймер ставится, только если его ещё нет: create() с тем же именем переносит срок, и раньше
+// проверка «раз в 15 минут» откладывалась при каждом пробуждении и не срабатывала.
+reloadIfUpdated();
+chrome.alarms.get('mn-update').then((alarm) => {
+  if (!alarm || alarm.periodInMinutes !== UPDATE_CHECK_MINUTES) chrome.alarms.create('mn-update', { periodInMinutes: UPDATE_CHECK_MINUTES });
+});
 
 chrome.runtime.onInstalled.addListener(() => {
   ensurePaired();
@@ -96,6 +108,16 @@ function badge(tabId, text, color) {
 const isWeb = (url) => /^https?:\/\//i.test(url || '');
 
 async function clip(tab, options) {
+  clipping += 1;
+  try {
+    return await clipNow(tab, options);
+  } finally {
+    clipping -= 1;
+    if (clipping === 0 && reloadPending) { reloadPending = false; reloadIfUpdated(); }
+  }
+}
+
+async function clipNow(tab, options) {
   const mode = options.mode || 'article';
   const body = { mode, title: options.title || '', url: isWeb(tab.url) ? tab.url : undefined, markdown: '', note: options.note || '',
     tags: options.tags || [], parent: options.parent || undefined, images: [] };

@@ -8,6 +8,13 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-11-13
+
+Works with MindNotes 1.5.0 or later; installs as a regular update, without questions.
+
+### Fixed
+- Chrome and Chromium browsers now pick up a new version of the extension by themselves. The check every 15 minutes often never fired: each time the browser woke the extension, the timer was pushed back. Now the extension checks the version on disk whenever it wakes up and every 5 minutes, and it waits for a clip in progress to finish before restarting.
+
 ### Changed
 - Releases are published only in this repository, without copies in the MindNotes repository (the 1.0.2 and 1.0.3 copies there were removed). MindNotes before 1.7.0 gets the plugin after it updates to 1.7.0.
 

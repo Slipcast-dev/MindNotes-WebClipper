@@ -49,7 +49,8 @@ The installer shows the state of each step and ticks off the finished ones. To c
 ## Updates
 
 MindNotes checks for plugin updates at launch and once a day. If a new version asks for no new permissions, it installs
-by itself (“Update automatically” in the plugin card) and the browser extension restarts by itself. New permissions
+by itself (“Update automatically” in the plugin card) and the browser extension restarts by itself: in Chrome and
+Chromium browsers when you open its popup, on any of its actions or within 5 minutes; in Safari together with the installer. New permissions
 need the Update button and a confirmation. The card always has “Check for Updates”.
 
 The plugin is not tied to a MindNotes version: the extension checks what the app can do (`features` in `/v1/status`)

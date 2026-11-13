@@ -1,11 +1,11 @@
 #!/bin/zsh
-# Убирает копии выпусков Web Clipper из репозитория MindNotes (scripts/app-copies.sh): MindNotes 1.7.0+ ищет плагин
+# Убирает копии выпусков Web Clipper из репозитория MindNotes (scripts/app-repo.sh): MindNotes 1.7.0+ ищет плагин
 # в его репозитории. Удаляются только выпуски с тегами webclipper-v…; теги остаются.
 #   ./scripts/remove-app-copies.sh         показать, что будет удалено, и спросить
 #   ./scripts/remove-app-copies.sh --yes   удалить без вопроса
 set -euo pipefail
 cd "$(dirname "$0")/.."
-source scripts/app-copies.sh
+source scripts/app-repo.sh
 prefix=$(/usr/bin/plutil -extract updates raw -o - manifest.json)
 
 copies=("${(@f)$(gh release list --repo "$APP_REPO" --limit 200 --json tagName --jq ".[].tagName | select(startswith(\"$prefix\"))")}")

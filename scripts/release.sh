@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-source scripts/app-copies.sh
+source scripts/app-repo.sh
 PLUGIN_REPO=$(/usr/bin/plutil -extract repository raw -o - manifest.json 2>/dev/null) || PLUGIN_REPO=""
 version=$(/usr/bin/plutil -extract version raw -o - manifest.json)
 prefix=$(/usr/bin/plutil -extract updates raw -o - manifest.json)
