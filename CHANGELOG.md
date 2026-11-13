@@ -9,6 +9,13 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-11-14
+
+Works with MindNotes 1.5.0 and later; installs as a regular update, without questions.
+
+### Changed
+- Installer and README texts match MindNotes 1.7.1: the browser connects only after you allow it in MindNotes; running the installer of the same version again does not reopen the connection window — click “Connect” in the extension. MindNotes 1.7.1 keeps updating Web Clipper by itself: its repository belongs to the MindNotes publisher.
+
 ## [1.0.4] - 2026-11-13
 
 Works with MindNotes 1.5.0 or later; installs as a regular update, without questions.

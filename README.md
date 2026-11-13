@@ -38,7 +38,7 @@ What browsers don't let apps do (Apple and Google rules):
 - **Safari** — one checkbox: the installer opens Settings → Extensions; turn on MindNotes Web Clipper. The build is ad-hoc signed, so first: Settings → Advanced → “Show features for web developers”, then Develop → “Allow Unsigned Extensions” (Safari resets this on restart; a Developer ID signature makes it permanent).
 - **Chrome, Arc, Brave, Edge, Vivaldi, Opera, Yandex Browser** — one drag: the installer opens the extensions page; turn on Developer mode and drag the Web Clipper icon from the installer window. Once the extension is in the Chrome Web Store, this step goes away too: the browser offers to turn it on by itself.
 
-The installer shows the state of each step and ticks off the finished ones. To connect a browser later: MindNotes Settings → Extensions → Connect Browsers.
+The installer shows the state of each step and ticks off the finished ones. To connect a browser later: MindNotes Settings → Extensions → Connect Browsers, or “Connect” in the extension. Running the installer of the same version again does not open the connection window (MindNotes 1.7.1 and later): a key is issued only after “Connect?” in MindNotes.
 
 ## Known limitations
 

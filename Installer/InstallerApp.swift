@@ -80,7 +80,7 @@ struct InstallerView: View {
             }
 
             HStack {
-                Text(tr("Браузер подключится сам — MindNotes один раз спросит разрешение.", "The browser connects by itself — MindNotes asks for permission once."))
+                Text(tr("Браузер подключится сам после разрешения в MindNotes. Нет вопроса — нажмите «Подключить» в расширении.", "The browser connects after you allow it in MindNotes. No question? Click “Connect” in the extension."))
                     .font(.system(size: 11)).foregroundStyle(.secondary)
                 Spacer()
                 if model.allDone {
