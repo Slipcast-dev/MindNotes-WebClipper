@@ -9,6 +9,14 @@ with **every** release: that is how the installer and MindNotes know the plugin 
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-11-14
+
+Works with MindNotes 1.5.0 and later; installs as a regular update, without questions.
+
+### Changed
+- The plugin description has an English version (`descriptions`): MindNotes 1.8.0 and later shows it in the language of its interface; older versions keep showing the Russian description.
+- The installer's diagnostic report (`--check`) is fully in the system language.
+
 ## [1.0.5] - 2026-11-14
 
 Works with MindNotes 1.5.0 and later; installs as a regular update, without questions.

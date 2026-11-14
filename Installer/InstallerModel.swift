@@ -157,7 +157,7 @@ final class InstallerModel: ObservableObject {
     static func report() async -> String {
         var lines = ["payload \(Paths.payloadVersion), safari appex: \(FileManager.default.fileExists(atPath: Bundle.main.builtInPlugInsURL!.appendingPathComponent("MindNotes Web Clipper Extension.appex").path))"]
         let mindNotes = NSWorkspace.shared.urlForApplication(withBundleIdentifier: Paths.mindNotesBundleID)
-        lines.append("MindNotes: \(mindNotes?.path ?? "нет"), plugins supported: \(mindNotes.map(Paths.supportsPlugins) ?? false), runs here: \(mindNotes.map(Paths.runsHere) ?? false), plugin: \(Paths.version(of: Paths.installedPlugin.appendingPathComponent("manifest.json")) ?? "нет")")
+        lines.append("MindNotes: \(mindNotes?.path ?? tr("нет", "none")), plugins supported: \(mindNotes.map(Paths.supportsPlugins) ?? false), runs here: \(mindNotes.map(Paths.runsHere) ?? false), plugin: \(Paths.version(of: Paths.installedPlugin.appendingPathComponent("manifest.json")) ?? tr("нет", "none"))")
         for b in Browser.installed() {
             let state = b.isSafari ? "enabled=\(await SafariExtension.isEnabled())" : "extension=\(b.hasChromeExtension())"
                 + " connected=\(Browser.connectedClientNames().contains(b.clientName))"
